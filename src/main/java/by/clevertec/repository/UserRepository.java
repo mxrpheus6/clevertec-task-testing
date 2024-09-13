@@ -4,34 +4,72 @@ import by.clevertec.common.UserType;
 import by.clevertec.entity.UserEntity;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 public class UserRepository {
 
-    private static final List<UserEntity> db = List.of(
-            new UserEntity(UUID.randomUUID(), "user1", OffsetDateTime.now(), UserType.USER),
-            new UserEntity(UUID.randomUUID(), "admin1", OffsetDateTime.now(), UserType.ADMIN),
-            new UserEntity(UUID.randomUUID(), "user2", OffsetDateTime.now(), UserType.USER)
-    );
+    private static List<UserEntity> db = new ArrayList<>(List.of(
+            new UserEntity(1L, "user1", OffsetDateTime.now(), UserType.USER),
+            new UserEntity(2L, "admin1", OffsetDateTime.now(), UserType.ADMIN),
+            new UserEntity(3L, "user2", OffsetDateTime.now(), UserType.USER)
+    ));
 
-    public List<UserEntity> getUsers() {
-        return db;
+    public Optional<List<UserEntity>> getUsers() {
+        if (db == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(db);
     }
 
-    public UserEntity getUserById(UUID id) {
-        return db.get(0);
+    public Optional<UserEntity> getUserById(Long id) {
+        for (UserEntity userEntity : db) {
+            if (userEntity.getId() == id) {
+                return Optional.of(userEntity);
+            }
+        }
+
+        return Optional.empty();
     }
 
-    public UserEntity create(UserEntity userEntity) {
-        return userEntity;
+    public Optional<UserEntity> create(UserEntity userEntity) {
+        if (userEntity == null) {
+            return Optional.empty();
+        }
+
+        db.add(userEntity);
+        return Optional.of(userEntity);
     }
 
-    public UserEntity update(UUID id, UserEntity newUserEntity) {
-        return newUserEntity.setId(id);
+    public Optional<UserEntity> update(Long id, UserEntity newUserEntity) {
+        if (id == null || newUserEntity == null) {
+            return Optional.empty();
+        }
+
+        newUserEntity.setId(id);
+        Optional<UserEntity> targetUser = getUserById(id);
+        if (targetUser.isPresent()) {
+            targetUser.map(userEntity ->
+                    userEntity.setId(id)
+                            .setUsername(newUserEntity.getUsername())
+                            .setUserType(newUserEntity.getUserType())
+                            .setDateOfBirth(newUserEntity.getDateOfBirth())
+            );
+        } else {
+            targetUser = Optional.empty();
+        }
+
+        return targetUser;
     }
 
-    public void delete(UUID id) {
-        //without body
+    public void delete(Long id) {
+        for (int i = 0; i < db.size(); i++) {
+            if (db.get(i).getId() == id){
+                db.remove(i);
+                return;
+            }
+        }
     }
 }

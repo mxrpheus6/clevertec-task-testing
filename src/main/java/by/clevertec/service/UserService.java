@@ -2,45 +2,65 @@ package by.clevertec.service;
 
 import by.clevertec.domain.User;
 import by.clevertec.entity.UserEntity;
+import by.clevertec.exception.UserNotFoundException;
 import by.clevertec.mapper.UserMapper;
-import by.clevertec.mapper.UserMapperImpl;
 import by.clevertec.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
+@RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository = new UserRepository();
-    private final UserMapper userMapper = new UserMapperImpl();
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public List<User> getUsers() {
-        List<UserEntity> users = userRepository.getUsers();
+        Optional<List<UserEntity>> users = userRepository.getUsers();
 
-        return userMapper.toDomains(users);
+        if (users.isPresent()) {
+            return userMapper.toDomains(users.get());
+        }
+
+        return List.of();
     }
 
-    public User getUserById(UUID id) {
-        UserEntity user = userRepository.getUserById(UUID.randomUUID());
+    public User getUserById(Long id) {
+        Optional<UserEntity> user = userRepository.getUserById(id);
 
-        return userMapper.toDomain(user);
+        if (user.isPresent()) {
+            return userMapper.toDomain(user.get());
+        }
+
+        throw new UserNotFoundException("User id=" + id + " not found");
     }
 
     public User create(User user) {
         UserEntity userEntity = userMapper.toEntity(user);
 
-        return userMapper.toDomain(userRepository.create(userEntity));
+        Optional<UserEntity> createdUser = userRepository.create(userEntity);
+
+        if (createdUser.isPresent()) {
+            return userMapper.toDomain(createdUser.get());
+        }
+
+        throw new UserNotFoundException("User creation failed");
     }
 
-    public User update(UUID id, User updatedUser) {
+    public User update(Long id, User updatedUser) {
         UserEntity userEntity = userMapper.toEntity(updatedUser);
 
-        UserEntity user = userRepository.update(id, userEntity);
+        Optional<UserEntity> user = userRepository.update(id, userEntity);
 
-        return userMapper.toDomain(user);
+        if (user.isPresent()) {
+            return userMapper.toDomain(user.get());
+        }
+
+        throw new UserNotFoundException("Update failed");
     }
 
-    public void delete(UUID id) {
+    public void delete(Long id) {
         userRepository.delete(id);
     }
 }
