@@ -2,19 +2,23 @@ package by.clevertec.repository;
 
 import by.clevertec.common.UserType;
 import by.clevertec.entity.UserEntity;
+import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class UserRepository {
 
-    private static List<UserEntity> db = new ArrayList<>(List.of(
-            new UserEntity(1L, "user1", OffsetDateTime.now(), UserType.USER),
-            new UserEntity(2L, "admin1", OffsetDateTime.now(), UserType.ADMIN),
-            new UserEntity(3L, "user2", OffsetDateTime.now(), UserType.USER)
-    ));
+    private static List<UserEntity> db = new ArrayList<>();
+
+    static {
+        db.add(new UserEntity(1L, "user1", OffsetDateTime.now(), UserType.USER));
+        db.add(new UserEntity(2L, "admin1", OffsetDateTime.now(), UserType.ADMIN));
+        db.add(new UserEntity(3L, "user2", OffsetDateTime.now(), UserType.USER));
+    }
 
     public Optional<List<UserEntity>> getUsers() {
         if (db == null) {

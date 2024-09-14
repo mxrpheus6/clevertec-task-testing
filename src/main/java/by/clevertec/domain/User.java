@@ -19,5 +19,4 @@ public class User {
     private OffsetDateTime dateOfBirth;
 
     private UserType userType;
-
 }

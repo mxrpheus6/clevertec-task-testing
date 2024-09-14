@@ -6,11 +6,13 @@ import by.clevertec.exception.UserNotFoundException;
 import by.clevertec.mapper.UserMapper;
 import by.clevertec.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Service
 public class UserService {
 
     private final UserRepository userRepository;
