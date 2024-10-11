@@ -1,7 +1,6 @@
 package by.clevertec.service;
 
 import by.clevertec.domain.User;
-import by.clevertec.domain.builder.UserBuilder;
 import by.clevertec.entity.UserEntity;
 import by.clevertec.exception.UserNotFoundException;
 import by.clevertec.mapper.UserMapper;

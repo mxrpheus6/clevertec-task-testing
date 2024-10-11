@@ -1,4 +1,4 @@
-package by.clevertec.domain.builder;
+package by.clevertec.common.builder;
 
 import by.clevertec.common.UserType;
 import by.clevertec.domain.User;
