@@ -2,7 +2,7 @@ package by.clevertec.contoller;
 
 import by.clevertec.domain.User;
 import by.clevertec.exception.UserNotFoundException;
-import by.clevertec.service.UserService;
+import by.clevertec.service.impl.UserServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class UserControllerTest {
     MockMvc mockMvc;
 
     @MockBean
-    UserService userService;
+    UserServiceImpl userServiceImpl;
 
     @Test
     void getUsers() throws Exception {
@@ -45,7 +45,7 @@ class UserControllerTest {
         users.add(user1);
         users.add(user2);
 
-        when(userService.getUsers()).thenReturn(users);
+        when(userServiceImpl.getUsers()).thenReturn(users);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/user-api/get/all"))
                 .andExpect(status().isOk())
@@ -64,7 +64,7 @@ class UserControllerTest {
     void getUserById() throws Exception {
         User user = new User(1L, "mxrpheus", OffsetDateTime.parse("2024-09-14T09:27:23.0046411+03:00"), ADMIN);
 
-        when(userService.getUserById(1L)).thenReturn(user);
+        when(userServiceImpl.getUserById(1L)).thenReturn(user);
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/user-api/get/1"))
                 .andExpect(status().isOk())
@@ -77,7 +77,7 @@ class UserControllerTest {
 
     @Test
     void getUserById_notFound() throws Exception {
-        when(userService.getUserById(anyLong())).thenThrow(new UserNotFoundException("User not found"));
+        when(userServiceImpl.getUserById(anyLong())).thenThrow(new UserNotFoundException("User not found"));
 
         this.mockMvc.perform(MockMvcRequestBuilders.get("/user-api/get/99"))
                 .andExpect(status().isInternalServerError())
@@ -92,7 +92,7 @@ class UserControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         String userJson = objectMapper.writeValueAsString(user);
 
-        when(userService.create(any(User.class))).thenReturn(user);
+        when(userServiceImpl.create(any(User.class))).thenReturn(user);
 
         this.mockMvc.perform(MockMvcRequestBuilders.post("/user-api/create")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -113,7 +113,7 @@ class UserControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         String userJson = objectMapper.writeValueAsString(user);
 
-        when(userService.create(any(User.class))).thenThrow(new UserNotFoundException("User creation failed"));
+        when(userServiceImpl.create(any(User.class))).thenThrow(new UserNotFoundException("User creation failed"));
 
         this.mockMvc.perform(MockMvcRequestBuilders.post("/user-api/create")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -131,7 +131,7 @@ class UserControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         String userJson = objectMapper.writeValueAsString(updatedUser);
 
-        when(userService.update(anyLong(), any(User.class))).thenReturn(updatedUser);
+        when(userServiceImpl.update(anyLong(), any(User.class))).thenReturn(updatedUser);
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("/user-api/update/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -152,7 +152,7 @@ class UserControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         String userJson = objectMapper.writeValueAsString(updatedUser);
 
-        when(userService.update(anyLong(), any(User.class))).thenThrow(new UserNotFoundException("User update failed"));
+        when(userServiceImpl.update(anyLong(), any(User.class))).thenThrow(new UserNotFoundException("User update failed"));
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("/user-api/update/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -166,7 +166,7 @@ class UserControllerTest {
     void delete() throws Exception {
         Long userId = 1L;
 
-        doNothing().when(userService).delete(userId);
+        doNothing().when(userServiceImpl).delete(userId);
 
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/user-api/delete/{id}", userId))
                 .andExpect(status().isOk())

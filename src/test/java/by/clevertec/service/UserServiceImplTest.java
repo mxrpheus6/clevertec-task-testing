@@ -5,6 +5,7 @@ import by.clevertec.entity.UserEntity;
 import by.clevertec.exception.UserNotFoundException;
 import by.clevertec.mapper.UserMapper;
 import by.clevertec.repository.UserRepository;
+import by.clevertec.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
@@ -39,7 +40,7 @@ class UserServiceTest {
     private UserMapper userMapper;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Captor
     private ArgumentCaptor<UserEntity> userEntityCaptor;
@@ -73,7 +74,7 @@ class UserServiceTest {
 
     @Test
     void getUsers() {
-        List<User> users = userService.getUsers();
+        List<User> users = userServiceImpl.getUsers();
 
         Assertions.assertEquals(3, users.size());
         Assertions.assertEquals(userDomains.get(0), users.get(0));
@@ -87,14 +88,14 @@ class UserServiceTest {
     @ParameterizedTest
     @ValueSource(longs = {1L, 2L, 3L})
     void getUserById(Long id) {
-        User user = userService.getUserById(id);
+        User user = userServiceImpl.getUserById(id);
 
         Assertions.assertEquals(userDomains.get((int)(id - 1L)), user);
     }
 
     @Test
     void getUserById_throwsException() {
-        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUserById(4L));
+        Assertions.assertThrows(UserNotFoundException.class, () -> userServiceImpl.getUserById(4L));
     }
 
     @Test
@@ -108,7 +109,7 @@ class UserServiceTest {
         when(userRepository.create(newUserEntity)).thenReturn(Optional.of(createdUserEntity));
         when(userMapper.toDomain(createdUserEntity)).thenReturn(createdUser);
 
-        User result = userService.create(newUser);
+        User result = userServiceImpl.create(newUser);
         Assertions.assertEquals(createdUser, result);
 
         verify(userRepository).create(userEntityCaptor.capture());
@@ -126,7 +127,7 @@ class UserServiceTest {
         when(userMapper.toEntity(newUser)).thenReturn(newUserEntity);
         when(userRepository.create(newUserEntity)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(UserNotFoundException.class, () -> userService.create(newUser));
+        Assertions.assertThrows(UserNotFoundException.class, () -> userServiceImpl.create(newUser));
     }
 
     @Test
@@ -141,7 +142,7 @@ class UserServiceTest {
         when(userRepository.update(id, newUserEntity)).thenReturn(Optional.of(updatedUserEntity));
         when(userMapper.toDomain(updatedUserEntity)).thenReturn(updatedUser);
 
-        User result = userService.update(id, newUser);
+        User result = userServiceImpl.update(id, newUser);
         Assertions.assertEquals(updatedUser, result);
     }
 
@@ -154,12 +155,12 @@ class UserServiceTest {
         when(userMapper.toEntity(newUser)).thenReturn(newUserEntity);
         when(userRepository.update(id, newUserEntity)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(UserNotFoundException.class, () -> userService.update(id, newUser));
+        Assertions.assertThrows(UserNotFoundException.class, () -> userServiceImpl.update(id, newUser));
     }
 
     @Test
     void delete() {
-        userService.delete(1L);
+        userServiceImpl.delete(1L);
 
         verify(userRepository, times(1)).delete(1L);
     }
