@@ -1,6 +1,7 @@
 package by.clevertec.repository;
 
 import by.clevertec.common.UserType;
+import by.clevertec.common.builder.UserEntityBuilder;
 import by.clevertec.entity.UserEntity;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,12 @@ public class UserRepository {
     private static List<UserEntity> db = new ArrayList<>();
 
     static {
-        db.add(new UserEntity(1L, "user1", OffsetDateTime.now(), UserType.USER));
+        db.add(new UserEntityBuilder()
+                .setId(1L)
+                .setUsername("user1")
+                .setDateOfBirth(OffsetDateTime.now())
+                .setUserType(UserType.USER)
+                .build());
         db.add(new UserEntity(2L, "admin1", OffsetDateTime.now(), UserType.ADMIN));
         db.add(new UserEntity(3L, "user2", OffsetDateTime.now(), UserType.USER));
     }
